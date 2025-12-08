@@ -76,7 +76,7 @@ def refresh_base_model(name, vae_name=None):
         return
 
     # Check if the file actually exists
-    if not os.path.isfile(filename):
+    if not filename or not os.path.isfile(filename):
         print(f'Base model file not found: {filename}')
         print(f'Skipping base model loading. Model will be loaded when available.')
         # Update filename to prevent repeated checks
@@ -107,7 +107,7 @@ def refresh_refiner_model(name):
         return
 
     # Check if the file actually exists
-    if not os.path.isfile(filename):
+    if not filename or not os.path.isfile(filename):
         print(f'Refiner model file not found: {filename}')
         print(f'Skipping refiner model loading. Model will be loaded when available.')
         # Update filename to prevent repeated checks
