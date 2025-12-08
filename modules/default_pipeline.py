@@ -355,6 +355,10 @@ def process_diffusion(positive_cond, negative_cond, steps, switch, width, height
     target_unet, target_vae, target_refiner_unet, target_refiner_vae, target_clip \
         = final_unet, final_vae, final_refiner_unet, final_refiner_vae, final_clip
 
+    # Check if base model is loaded
+    if final_unet is None:
+        raise ValueError('Base model is not loaded. Please ensure a valid checkpoint model is available and loaded.')
+
     assert refiner_swap_method in ['joint', 'separate', 'vae']
 
     if final_refiner_vae is not None and final_refiner_unet is not None:
