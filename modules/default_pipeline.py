@@ -68,17 +68,20 @@ def refresh_base_model(name, vae_name=None):
 
     filename = get_file_from_folder_list(name, modules.config.paths_checkpoints)
 
-    # Check if the file actually exists
-    if not os.path.isfile(filename):
-        print(f'Base model file not found: {filename}')
-        print(f'Skipping base model loading. Model will be loaded when available.')
-        return
-
     vae_filename = None
     if vae_name is not None and vae_name != modules.flags.default_vae:
         vae_filename = get_file_from_folder_list(vae_name, modules.config.path_vae)
 
     if model_base.filename == filename and model_base.vae_filename == vae_filename:
+        return
+
+    # Check if the file actually exists
+    if not os.path.isfile(filename):
+        print(f'Base model file not found: {filename}')
+        print(f'Skipping base model loading. Model will be loaded when available.')
+        # Update filename to prevent repeated checks
+        model_base.filename = filename
+        model_base.vae_filename = vae_filename
         return
 
     model_base = core.load_model(filename, vae_filename)
@@ -107,6 +110,8 @@ def refresh_refiner_model(name):
     if not os.path.isfile(filename):
         print(f'Refiner model file not found: {filename}')
         print(f'Skipping refiner model loading. Model will be loaded when available.')
+        # Update filename to prevent repeated checks
+        model_refiner.filename = filename
         return
 
     model_refiner = core.load_model(filename)
