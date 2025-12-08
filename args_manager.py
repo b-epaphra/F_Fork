@@ -26,7 +26,10 @@ args_parser.parser.add_argument("--disable-metadata", action='store_true',
                                 help="Disables saving metadata to images.")
 
 args_parser.parser.add_argument("--disable-preset-download", action='store_true',
-                                help="Disables downloading models for presets", default=False)
+                                help="Disables downloading models for presets (now disabled by default)")
+args_parser.parser.add_argument("--enable-preset-download", dest='disable_preset_download',
+                                action='store_false',
+                                help="Enables downloading models for presets")
 
 args_parser.parser.add_argument("--disable-enhance-output-sorting", action='store_true',
                                 help="Disables enhance output sorting for final image gallery.")
@@ -43,7 +46,8 @@ args_parser.parser.add_argument("--rebuild-hash-cache", help="Generates missing 
 args_parser.parser.set_defaults(
     disable_cuda_malloc=True,
     in_browser=True,
-    port=None
+    port=None,
+    disable_preset_download=True
 )
 
 args_parser.args = args_parser.parser.parse_args()

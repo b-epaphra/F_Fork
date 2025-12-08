@@ -67,12 +67,14 @@ After you download the file, please uncompress it and then run the "run.bat".
 
 ![image](https://github.com/lllyasviel/Fooocus/assets/19834515/c49269c4-c274-4893-b368-047c401cc58c)
 
-The first time you launch the software, it will automatically download models:
+**Note:** Starting from this version, Fooocus **does not automatically download checkpoint models** by default. You need to either:
+1. Download [default models](#models) manually to the folder "Fooocus\models\checkpoints", OR
+2. Use the `--enable-preset-download` flag to enable automatic downloads, OR  
+3. Use `--always-download-new-model` to download missing models
 
-1. It will download [default models](#models) to the folder "Fooocus\models\checkpoints" given different presets. You can download them in advance if you do not want automatic download.
-2. Note that if you use inpaint, at the first time you inpaint an image, it will download [Fooocus's own inpaint control model from here](https://huggingface.co/lllyasviel/fooocus_inpaint/resolve/main/inpaint_v26.fooocus.patch) as the file "Fooocus\models\inpaint\inpaint_v26.fooocus.patch" (the size of this file is 1.28GB).
+If you use inpaint, at the first time you inpaint an image, it will download [Fooocus's own inpaint control model from here](https://huggingface.co/lllyasviel/fooocus_inpaint/resolve/main/inpaint_v26.fooocus.patch) as the file "Fooocus\models\inpaint\inpaint_v26.fooocus.patch" (the size of this file is 1.28GB).
 
-After Fooocus 2.1.60, you will also have `run_anime.bat` and `run_realistic.bat`. They are different model presets (and require different models, but they will be automatically downloaded). [Check here for more details](https://github.com/lllyasviel/Fooocus/discussions/679).
+After Fooocus 2.1.60, you will also have `run_anime.bat` and `run_realistic.bat`. They are different model presets (and require different models). To enable automatic model downloads for these presets, use `--enable-preset-download` flag. [Check here for more details](https://github.com/lllyasviel/Fooocus/discussions/679).
 
 After Fooocus 2.3.0 you can also switch presets directly in the browser. Keep in mind to add these arguments if you want to change the default behavior:
 * Use `--disable-preset-selection` to disable preset selection in the browser.
@@ -135,10 +137,10 @@ If you want to use Anaconda/Miniconda, you can
     conda activate fooocus
     pip install -r requirements_versions.txt
 
-Then download the models: download [default models](#models) to the folder "Fooocus\models\checkpoints". **Or let Fooocus automatically download the models** using the launcher:
+Then download the models: download [default models](#models) to the folder "Fooocus\models\checkpoints". **Or let Fooocus automatically download the models** by using the `--enable-preset-download` flag with the launcher:
 
     conda activate fooocus
-    python entry_with_update.py
+    python entry_with_update.py --enable-preset-download
 
 Or, if you want to open a remote port, use
 
@@ -281,7 +283,7 @@ Given different goals, the default models and configs of Fooocus are different:
 | Realistic | run_realistic.bat | --preset realistic | realisticStockPhoto_v20     | not used | [here](https://github.com/lllyasviel/Fooocus/blob/main/presets/realistic.json) |
 | Anime     | run_anime.bat | --preset anime | animaPencilXL_v500          | not used | [here](https://github.com/lllyasviel/Fooocus/blob/main/presets/anime.json)     |
 
-Note that the download is **automatic** - you do not need to do anything if the internet connection is okay. However, you can download them manually if you (or move them from somewhere else) have your own preparation.
+Note that the download is **not automatic by default** - you need to use `--enable-preset-download` flag to enable automatic downloads, or download the models manually. You can download them manually (or move them from somewhere else) to the appropriate folder for your preset.
 
 ## UI Access and Authentication
 In addition to running on localhost, Fooocus can also expose its UI in two ways: 
@@ -388,6 +390,7 @@ entry_with_update.py  [-h] [--listen [IP]] [--port PORT]
                       [--disable-offload-from-vram] [--theme THEME]
                       [--disable-image-log] [--disable-analytics]
                       [--disable-metadata] [--disable-preset-download]
+                      [--enable-preset-download]
                       [--disable-enhance-output-sorting]
                       [--enable-auto-describe-image]
                       [--always-download-new-model]
