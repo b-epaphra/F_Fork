@@ -48,6 +48,10 @@ def refresh_controlnets(model_paths):
 def assert_model_integrity():
     error_message = None
 
+    # Skip integrity check if model is not loaded yet
+    if model_base.unet_with_lora is None:
+        return True
+
     if not isinstance(model_base.unet_with_lora.model, SDXL):
         error_message = 'You have selected base model other than SDXL. This is not supported yet.'
 
@@ -71,6 +75,22 @@ def refresh_base_model(name, vae_name=None):
     if model_base.filename == filename and model_base.vae_filename == vae_filename:
         return
 
+    # Check if the file actually exists
+    if filename is None:
+        print(f'Base model name "{name}" is invalid or path could not be determined.')
+        print(f'Skipping base model loading. Model will be loaded when available.')
+        # Update filename to prevent repeated checks
+        model_base.filename = filename
+        model_base.vae_filename = vae_filename
+        return
+    elif not os.path.isfile(filename):
+        print(f'Base model file not found: {filename}')
+        print(f'Skipping base model loading. Model will be loaded when available.')
+        # Update filename to prevent repeated checks
+        model_base.filename = filename
+        model_base.vae_filename = vae_filename
+        return
+
     model_base = core.load_model(filename, vae_filename)
     print(f'Base model loaded: {model_base.filename}')
     print(f'VAE loaded: {model_base.vae_filename}')
@@ -91,6 +111,20 @@ def refresh_refiner_model(name):
 
     if name == 'None':
         print(f'Refiner unloaded.')
+        return
+
+    # Check if the file actually exists
+    if filename is None:
+        print(f'Refiner model name "{name}" is invalid or path could not be determined.')
+        print(f'Skipping refiner model loading. Model will be loaded when available.')
+        # Update filename to prevent repeated checks
+        model_refiner.filename = filename
+        return
+    elif not os.path.isfile(filename):
+        print(f'Refiner model file not found: {filename}')
+        print(f'Skipping refiner model loading. Model will be loaded when available.')
+        # Update filename to prevent repeated checks
+        model_refiner.filename = filename
         return
 
     model_refiner = core.load_model(filename)
@@ -225,7 +259,9 @@ def prepare_text_encoder(async_call=True):
         # TODO: make sure that this is always called in an async way so that users cannot feel it.
         pass
     assert_model_integrity()
-    ldm_patched.modules.model_management.load_models_gpu([final_clip.patcher, final_expansion.patcher])
+    # Skip if models are not loaded yet
+    if final_clip is not None and final_expansion is not None:
+        ldm_patched.modules.model_management.load_models_gpu([final_clip.patcher, final_expansion.patcher])
     return
 
 
@@ -336,6 +372,10 @@ def get_candidate_vae(steps, switch, denoise=1.0, refiner_swap_method='joint'):
 def process_diffusion(positive_cond, negative_cond, steps, switch, width, height, image_seed, callback, sampler_name, scheduler_name, latent=None, denoise=1.0, tiled=False, cfg_scale=7.0, refiner_swap_method='joint', disable_preview=False):
     target_unet, target_vae, target_refiner_unet, target_refiner_vae, target_clip \
         = final_unet, final_vae, final_refiner_unet, final_refiner_vae, final_clip
+
+    # Check if base model is loaded
+    if final_unet is None:
+        raise ValueError('Base model is not loaded. Please ensure a valid checkpoint model is available and loaded.')
 
     assert refiner_swap_method in ['joint', 'separate', 'vae']
 
